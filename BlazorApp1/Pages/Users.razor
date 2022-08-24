@@ -1,0 +1,64 @@
+﻿@page "/users"
+@inject Services.UserService userService
+@using Data
+
+<h3>Create User</h3>
+
+<div class="container mx-auto my-3">
+    <EditForm Model=@user OnValidSubmit="AddRecord">
+        <div class="mb-1">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" @bind-value=user.Name id="name" class="form-control" name="name">
+        </div>
+        <div class="mb-1">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" @bind-value=user.LastName id="lastName" class="form-control" name="lastName">
+        </div>
+
+        <input type="submit" class="btn btn-dark my-4" />
+    </EditForm>
+
+    <div class="my-3"> 
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var user in users)
+                {
+                    <tr>
+                        <th scope="row">@user.Id</th>
+                        <td>@user.Name</td>
+                        <td>@user.LastName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    User user = new User();
+    List<User> users = new List<User>();
+
+    public async Task LoadData()
+    {
+        users = await userService.FetchUsers();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    public async Task AddRecord()
+    {
+        await userService.AddNewUser(user);
+        user = new User();
+        LoadData();
+    }
+}
